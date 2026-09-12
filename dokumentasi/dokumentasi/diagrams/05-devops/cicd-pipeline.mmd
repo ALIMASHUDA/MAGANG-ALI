@@ -1,0 +1,13 @@
+flowchart LR
+  A["Push / Pull Request\nke GitHub"] --> B["Install Dependencies\nnpm ci"]
+  B --> C["Lint\nnpm run lint"]
+  C --> D["Type Check\nnpm run typecheck"]
+  D --> E["Unit and Integration Test\nnpm test"]
+  E --> F["Build Production\nnpm run build"]
+  F --> G{"Jenis Branch?"}
+  G -->|Pull Request| H["Deploy Preview\nVercel Preview URL"]
+  G -->|push ke main| I["Deploy Production\nVercel Production"]
+  H --> J["Review dan E2E Test\nPlaywright pada Preview URL"]
+  J -->|approve dan merge| I
+  I --> K["Post-deploy Smoke Test"]
+  K --> L["Monitoring\nVercel Analytics + Supabase Logs"]

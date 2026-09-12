@@ -1,0 +1,33 @@
+erDiagram
+  PROFILES ||--o{ DOCUMENTS : uploads
+  PROFILES ||--o{ EXTRACTION_RUNS : runs
+  DOCUMENTS ||--o{ EXTRACTION_RUNS : "processed as"
+
+  PROFILES {
+    uuid id PK
+    text full_name
+    text role
+    timestamptz created_at
+  }
+  DOCUMENTS {
+    uuid id PK
+    uuid user_id FK
+    text name
+    text storage_path
+    text mime_type
+    bigint size_bytes
+    timestamptz created_at
+  }
+  EXTRACTION_RUNS {
+    uuid id PK
+    uuid user_id FK
+    uuid document_id FK
+    text prompt
+    text provider_used
+    text model_used
+    text status
+    jsonb result_json
+    text error_message
+    timestamptz created_at
+    timestamptz completed_at
+  }

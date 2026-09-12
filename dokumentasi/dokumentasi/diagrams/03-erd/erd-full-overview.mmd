@@ -1,0 +1,18 @@
+erDiagram
+  AUTH_USERS ||--|| PROFILES : has
+  AUTH_USERS ||--o{ DOCUMENTS : owns
+  AUTH_USERS ||--o{ EXTRACTION_RUNS : owns
+  AUTH_USERS ||--o{ STOCK_ITEMS : owns
+  AUTH_USERS ||--o{ OPNAME_SESSIONS : owns
+  AUTH_USERS ||--o{ CLIENTS : owns
+  AUTH_USERS ||--o{ SERVICE_TICKETS : owns
+  DOCUMENTS ||--o{ EXTRACTION_RUNS : "referenced by"
+  STOCK_CATEGORIES ||--o{ STOCK_ITEMS : classifies
+  OPNAME_SESSIONS ||--o{ OPNAME_ITEMS : contains
+  STOCK_ITEMS ||--o{ OPNAME_ITEMS : "counted in"
+  CLIENTS ||--o{ SERVICE_TICKETS : requests
+  SERVICE_TICKETS ||--o{ SERVICE_TICKET_UPDATES : "history of"
+
+  AUTH_USERS {
+    uuid id PK "dikelola Supabase Auth"
+  }

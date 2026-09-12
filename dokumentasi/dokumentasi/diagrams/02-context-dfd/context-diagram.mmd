@@ -1,0 +1,14 @@
+flowchart LR
+  ADMIN(["Admin / Staf\n(pengguna internal)"])
+
+  SYS["SISTEM TERASOPS\n\nOtomasi Data AI, Stok Opname Material,\ndan Sales Service"]
+
+  SUPA[("Supabase Platform\nAuth + PostgreSQL + Storage")]
+  AI["Penyedia AI Eksternal\nOpenRouter + Google Gemini"]
+
+  ADMIN -->|Login, upload dokumen, input stok fisik,\nkelola tiket layanan| SYS
+  SYS -->|Dashboard, hasil ekstraksi AI,\nlaporan selisih stok, status tiket| ADMIN
+
+  SYS <-->|Simpan/ambil data, autentikasi JWT,\nsimpan file dokumen| SUPA
+  SYS -->|Teks dokumen + prompt pengguna| AI
+  AI -->|Data terstruktur JSON| SYS

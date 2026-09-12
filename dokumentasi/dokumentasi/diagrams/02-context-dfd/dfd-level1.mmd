@@ -1,0 +1,28 @@
+flowchart TB
+  ADMIN(["Admin / Staf"])
+  P1V(["Provider AI 1\nOpenRouter"])
+  P2V(["Provider AI 2\nGemini"])
+
+  S1("1.1 Upload dan Ekstraksi\nExcel to markdown table,\nPDF to teks mentah")
+  S2("1.2 Susun Prompt AI\nSystem prompt + prompt user\n+ konten dokumen")
+  S3("1.3 Proses AI Fallback Berantai\nCoba provider 1, jika gagal\nlanjut provider 2, dst")
+  S4("1.4 Validasi Output\nParse JSON dan validasi\nskema dengan Zod")
+  S5("1.5 Simpan dan Tampilkan\nUpdate status run,\nsajikan tabel + ringkasan")
+
+  D1[("D1 documents")]
+  D2[("D2 extraction_runs")]
+  STORE[("Supabase Storage\nbucket documents")]
+
+  ADMIN -->|pilih file .xlsx/.pdf, tulis prompt| S1
+  S1 -->|simpan file asli| STORE
+  S1 -->|simpan metadata dokumen| D1
+  S1 -->|teks/tabel hasil ekstraksi| S2
+  S2 -->|system prompt + user prompt| S3
+  S3 -->|permintaan completion| P1V
+  P1V -.error/limit, alihkan.-> S3
+  S3 -->|percobaan kedua jika perlu| P2V
+  P1V -->|teks JSON mentah| S4
+  P2V -->|teks JSON mentah| S4
+  S4 -->|hasil tervalidasi: summary + rows| S5
+  S5 -->|update status success/failed,\nprovider_used, model_used| D2
+  S5 -->|tabel hasil, tombol unduh Excel/JSON| ADMIN

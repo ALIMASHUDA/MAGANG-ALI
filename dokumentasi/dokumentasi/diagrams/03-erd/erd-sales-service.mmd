@@ -1,0 +1,32 @@
+erDiagram
+  PROFILES ||--o{ CLIENTS : owns
+  PROFILES ||--o{ SERVICE_TICKETS : owns
+  CLIENTS ||--o{ SERVICE_TICKETS : requests
+  SERVICE_TICKETS ||--o{ SERVICE_TICKET_UPDATES : "history of"
+
+  CLIENTS {
+    uuid id PK
+    uuid user_id FK
+    text name
+    text company
+    text phone
+    text email
+  }
+  SERVICE_TICKETS {
+    uuid id PK
+    uuid user_id FK
+    text ticket_number UK
+    uuid client_id FK
+    text service_type
+    text description
+    text status
+    timestamptz updated_at
+  }
+  SERVICE_TICKET_UPDATES {
+    uuid id PK
+    uuid ticket_id FK
+    text old_status
+    text new_status
+    text note
+    uuid created_by FK
+  }

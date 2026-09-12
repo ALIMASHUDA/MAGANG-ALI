@@ -1,0 +1,35 @@
+flowchart TB
+  ADMIN(["Admin / Staf"])
+  AI["Penyedia AI Eksternal\nOpenRouter / Gemini"]
+  SUPA_AUTH["Supabase Auth"]
+
+  P1("1.0 Otomasi Data\nUpload, ekstrak, proses AI")
+  P2("2.0 Stok Opname Material\nHitung selisih fisik vs sistem")
+  P3("3.0 Sales Service\nKelola tiket layanan")
+
+  D1[("D1 documents")]
+  D2[("D2 extraction_runs")]
+  D3[("D3 stock_items /\nstock_categories")]
+  D4[("D4 opname_sessions /\nopname_items")]
+  D5[("D5 clients")]
+  D6[("D6 service_tickets /\nservice_ticket_updates")]
+
+  ADMIN -->|login| SUPA_AUTH
+  SUPA_AUTH -->|sesi terautentikasi JWT| ADMIN
+
+  ADMIN -->|upload file + prompt| P1
+  P1 -->|simpan metadata file| D1
+  P1 -->|panggil dengan teks dokumen| AI
+  AI -->|hasil JSON terstruktur| P1
+  P1 -->|simpan riwayat proses| D2
+  P1 -->|tabel hasil + ringkasan| ADMIN
+
+  ADMIN -->|buat sesi, input stok fisik| P2
+  P2 -->|baca master barang| D3
+  P2 -->|simpan sesi dan hasil hitung| D4
+  P2 -->|laporan selisih, ekspor Excel| ADMIN
+
+  ADMIN -->|kelola klien dan tiket| P3
+  P3 -->|simpan data klien| D5
+  P3 -->|simpan tiket dan histori status| D6
+  P3 -->|status dan timeline tiket| ADMIN

@@ -1,0 +1,36 @@
+flowchart TB
+  GH["GitHub Repository\n(source code + version control)"]
+
+  subgraph CLIENT["Client Layer"]
+    BR["Browser Desktop / Mobile\nReact 19 + Next.js App Router"]
+  end
+
+  subgraph VERCEL["Vercel Edge Network (Hosting and CI or CD)"]
+    MW["Edge Middleware\nSession refresh and route guard"]
+    SSR["Next.js Server Components (SSR)"]
+    API["Serverless API Routes\nPOST /api/extract\nPOST /api/ai/process"]
+  end
+
+  subgraph SUPA["Supabase Cloud - Singapore Region (BaaS)"]
+    AUTH["Supabase Auth\nJWT and Email/Password"]
+    DB[("PostgreSQL 15\nplus Row Level Security")]
+    STORE["Supabase Storage\nbucket: documents (private)"]
+  end
+
+  subgraph AIPROV["External AI Provider - Fallback Chain"]
+    P1["Provider 1: OpenRouter\nOpenAI-compatible gateway"]
+    P2["Provider 2: Google Gemini"]
+  end
+
+  GH -->|git push, auto build and deploy| VERCEL
+  BR -->|HTTPS request| MW
+  MW --> SSR
+  SSR --> API
+  BR -->|PostgREST query, protected by RLS| DB
+  BR -->|Auth SDK login/signup| AUTH
+  BR -->|Upload/Download file| STORE
+  API -->|save extracted text, log run| DB
+  API -->|read/write file server-side| STORE
+  API -->|1st attempt| P1
+  API -.2nd attempt if error/limit.-> P2
+  AUTH -. issues JWT, validated by .-> DB

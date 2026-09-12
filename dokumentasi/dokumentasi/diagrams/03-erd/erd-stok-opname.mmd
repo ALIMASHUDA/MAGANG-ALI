@@ -1,0 +1,38 @@
+erDiagram
+  STOCK_CATEGORIES ||--o{ STOCK_ITEMS : classifies
+  PROFILES ||--o{ STOCK_ITEMS : owns
+  PROFILES ||--o{ OPNAME_SESSIONS : creates
+  OPNAME_SESSIONS ||--o{ OPNAME_ITEMS : contains
+  STOCK_ITEMS ||--o{ OPNAME_ITEMS : "counted in"
+
+  STOCK_CATEGORIES {
+    uuid id PK
+    text name UK
+    timestamptz created_at
+  }
+  STOCK_ITEMS {
+    uuid id PK
+    uuid user_id FK
+    text code
+    text name
+    text unit
+    uuid category_id FK
+    numeric system_stock
+    numeric min_stock
+  }
+  OPNAME_SESSIONS {
+    uuid id PK
+    uuid user_id FK
+    date session_date
+    text note
+    text status
+  }
+  OPNAME_ITEMS {
+    uuid id PK
+    uuid session_id FK
+    uuid item_id FK
+    numeric system_stock
+    numeric physical_stock
+    numeric difference
+    text note
+  }

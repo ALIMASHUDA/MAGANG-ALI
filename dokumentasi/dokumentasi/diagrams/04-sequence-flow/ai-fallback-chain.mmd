@@ -1,0 +1,31 @@
+sequenceDiagram
+  actor U as Admin / Staf
+  participant FE as Browser (Next.js Client)
+  participant API as API Route /api/ai/process
+  participant DB as Supabase Postgres
+  participant P1 as Provider 1: OpenRouter
+  participant P2 as Provider 2: Gemini
+
+  U->>FE: Upload file dan tulis prompt
+  FE->>API: POST /api/extract (file)
+  API-->>FE: teks / tabel hasil ekstraksi
+  FE->>API: POST /api/ai/process (prompt, content)
+  API->>DB: insert extraction_runs, status=processing
+  API->>P1: chat.completions.create()
+  alt Provider 1 berhasil
+    P1-->>API: teks JSON
+  else Provider 1 gagal (error / rate limit)
+    P1--xAPI: error / timeout
+    API->>P2: generateContent()
+    alt Provider 2 berhasil
+      P2-->>API: teks JSON
+    else Provider 2 juga gagal
+      P2--xAPI: error
+      API->>DB: update status=failed, error_message
+      API-->>FE: HTTP 502 Layanan AI tidak tersedia
+    end
+  end
+  API->>API: parseAiResult() dan validasi skema Zod
+  API->>DB: update status=success, result_json, provider_used, model_used
+  API-->>FE: summary, rows, providerUsed, modelUsed
+  FE-->>U: Tampilkan tabel hasil dan tombol unduh

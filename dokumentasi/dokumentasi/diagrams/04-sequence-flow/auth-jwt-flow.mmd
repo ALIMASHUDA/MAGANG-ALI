@@ -1,0 +1,25 @@
+sequenceDiagram
+  actor U as User
+  participant BR as Browser
+  participant MW as Next.js Middleware
+  participant AUTH as Supabase Auth
+  participant DB as Postgres (RLS)
+
+  U->>BR: Login dengan email dan password
+  BR->>AUTH: signInWithPassword()
+  AUTH-->>BR: access_token (JWT) dan refresh_token (cookie)
+
+  U->>BR: Buka halaman terproteksi
+  BR->>MW: HTTP request plus cookie sesi
+  MW->>AUTH: auth.getUser() validasi token
+  alt Token valid
+    AUTH-->>MW: user tervalidasi, refresh token bila perlu
+    MW-->>BR: lanjutkan request, set-cookie token baru
+  else Token tidak ada / kadaluarsa
+    AUTH-->>MW: user = null
+    MW-->>BR: redirect ke /login
+  end
+
+  BR->>DB: query data, misal supabase.from("stock_items")
+  DB->>DB: RLS memeriksa auth.uid() dari klaim JWT
+  DB-->>BR: hanya baris data milik user tersebut

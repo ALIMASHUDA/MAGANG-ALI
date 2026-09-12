@@ -1,0 +1,34 @@
+flowchart TB
+  subgraph BOUNDARY["System Boundary: Aplikasi Web TerasOps"]
+    direction TB
+    subgraph PRES["Presentation Layer - src/app, src/components"]
+      PAGES["Pages: dashboard, otomasi-data,\nstok-opname, sales-service, login"]
+      FEATCOMP["Feature Client Components\notomasi-data-client, stok-opname-client,\nsales-service-client"]
+      UICOMP["UI Components\nui/, layout/, shared/"]
+    end
+    subgraph APPLOGIC["Application and Business Logic - src/lib"]
+      AICHAIN["lib/ai\nproviders, chain, extract, schema"]
+      SUPACLIENT["lib/supabase\nclient, server, middleware"]
+      PROMPTS["lib/prompts, lib/constants, lib/utils"]
+    end
+    subgraph APIROUTES["API Layer - src/app/api"]
+      EXTAPI["POST /api/extract"]
+      AIAPI["POST /api/ai/process"]
+    end
+  end
+
+  subgraph EXTERNAL["External Systems - di luar system boundary"]
+    SUPABASE[("Supabase Platform\nAuth, PostgreSQL+RLS, Storage")]
+    AIPROV["AI Providers\nOpenRouter, Gemini"]
+  end
+
+  PAGES --> FEATCOMP
+  FEATCOMP --> UICOMP
+  FEATCOMP -->|CRUD langsung via PostgREST| SUPACLIENT
+  FEATCOMP -->|upload dan proses AI| EXTAPI
+  FEATCOMP --> AIAPI
+  EXTAPI --> PROMPTS
+  AIAPI --> AICHAIN
+  AICHAIN --> AIPROV
+  SUPACLIENT --> SUPABASE
+  AIAPI --> SUPACLIENT
